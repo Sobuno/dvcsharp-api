@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using dvcsharp_core_api.Models;
 using dvcsharp_core_api.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace dvcsharp_core_api
 {
@@ -70,7 +68,21 @@ namespace dvcsharp_core_api
 
          var query = $"SELECT * From Products WHERE name LIKE '%{keyword}%' OR description LIKE '%{keyword}%'";
          var products = _context.Products
-            .FromSql(query)
+            .FromSqlRaw(query)
+            .ToList();
+
+         return Ok(products);
+      }
+      
+      [HttpGet("search2")]
+      public IActionResult Search2(string keyword)
+      {
+         if (String.IsNullOrEmpty(keyword)) {
+            return Ok("Cannot search without a keyword");
+         }
+
+         var products = _context.Products
+            .FromSql($"SELECT * From Products WHERE name LIKE '%{keyword}%' OR description LIKE '%{keyword}%'")
             .ToList();
 
          return Ok(products);
