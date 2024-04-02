@@ -48,5 +48,33 @@ namespace dvcsharp_core_api
 
          return Ok(entities);
       }
+      
+      [HttpPost("test")]
+      public IActionResult Post2()
+      {
+         XmlDocument xmlDocument = new XmlDocument();
+         xmlDocument.XmlResolver = new XmlUrlResolver();
+         xmlDocument.Load(HttpContext.Request.Body);
+
+         var entities = new List<Object>();
+
+         foreach(XmlElement xmlItem in xmlDocument.SelectNodes("Entities/Entity"))
+         {
+            string typeName = xmlItem.GetAttribute("Type");
+
+            if(String.IsNullOrEmpty(typeName))
+               continue;
+
+            //Console.WriteLine("Trying to deserialize: " + typeName);
+            //Console.WriteLine("Content: " + xmlItem.InnerXml);
+
+            var xser = new XmlSerializer(Type.GetType(typeName));
+            var reader = new XmlTextReader(new StringReader(xmlItem.InnerXml));
+
+            entities.Add(xser.Deserialize(reader));
+         }
+
+         return Ok(entities);
+      }
    }
 }
