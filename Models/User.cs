@@ -70,10 +70,9 @@ namespace dvcsharp_core_api.Models
 
       private static string getHashedPassword(string password)
       {
-         var md5 = MD5.Create();
-         var hash = md5.ComputeHash(System.Text.Encoding.ASCII.GetBytes(password));
-
-         return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+         var salt = "salty"u8.ToArray();
+         var hashed = new Rfc2898DeriveBytes(password, salt);
+         return hashed.ToString();
       }
 
       public static AuthorizationResponse authorizeCreateAccessToken(GenericDataContext _context, 
