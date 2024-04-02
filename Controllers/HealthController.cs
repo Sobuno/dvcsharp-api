@@ -21,5 +21,11 @@ namespace dvcsharp_core_api
       {
          return Ok("<h1>API is healthy: " + message + "</h1>");
       }
+
+      [HttpGet]
+      public void RedirectUser([FromQuery] string url)
+      {
+         Response.Redirect(url);
+      }
    }
 }
