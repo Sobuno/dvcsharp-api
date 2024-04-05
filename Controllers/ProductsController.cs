@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
+using dvcsharp_core_api.Abstractions;
 using dvcsharp_core_api.Models;
 using dvcsharp_core_api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +14,9 @@ namespace dvcsharp_core_api
    [Route("api/[controller]")]
    public class ProductsController : Controller
    {
-      private readonly ProductsService _productsService;
+      private readonly IProductsService _productsService;
 
-      public ProductsController(ProductsService productsService)
+      public ProductsController(IProductsService productsService)
       {
          _productsService = productsService;
       }

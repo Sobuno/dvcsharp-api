@@ -1,16 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Serialization;
-using Azure;
+using dvcsharp_core_api.Abstractions;
 using dvcsharp_core_api.Data;
 using dvcsharp_core_api.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace dvcsharp_core_api.Services;
 
-public class ProductsService
+public class ProductsService : IProductsService
 {
     private readonly GenericDataContext _context;
     
