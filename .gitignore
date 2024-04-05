@@ -75,3 +75,6 @@ _[Ss]cripts
 *.dot[Cc]over
 
 tmp/*.db
+
+.idea/
+.sonarqube/
