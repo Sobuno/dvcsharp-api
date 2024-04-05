@@ -4,7 +4,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 using dvcsharp_core_api.Models;
-using dvcsharp_core_api.Data;
+using dvcsharp_core_api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,17 +13,17 @@ namespace dvcsharp_core_api
    [Route("api/[controller]")]
    public class ProductsController : Controller
    {
-      private readonly GenericDataContext _context;
+      private readonly ProductsService _productsService;
 
-      public ProductsController(GenericDataContext context)
+      public ProductsController(ProductsService productsService)
       {
-         _context = context;
+         _productsService = productsService;
       }
 
       [HttpGet]
       public IEnumerable<Product> Get()
       {
-         return _context.Products.ToList();
+         return _productsService.GetProducts();
       }
 
       [HttpPost]
@@ -34,17 +34,15 @@ namespace dvcsharp_core_api
             return BadRequest(ModelState);
          }
 
-         var existingProduct = _context.Products.
-            Where(b => (b.name == product.name) || (b.skuId == product.skuId)).
-            FirstOrDefault();
-         
-         if(existingProduct != null) {
-            ModelState.AddModelError("name", "Product name or skuId is already taken");
-            return BadRequest(ModelState);
+         try
+         {
+            _productsService.AddProduct(product);
          }
-
-         _context.Products.Add(product);
-         _context.SaveChanges();
+         catch (Exception e)
+         {
+            ModelState.AddModelError("name", e.Message);
+            return BadRequest(ModelState);            
+         }
 
          return Ok(product);
       }
@@ -56,7 +54,7 @@ namespace dvcsharp_core_api
          XmlSerializer serializer = new XmlSerializer(typeof(Product[]), root);
 
          Response.ContentType = "application/xml";
-         serializer.Serialize(HttpContext.Response.Body, _context.Products.ToArray());
+         serializer.Serialize(HttpContext.Response.Body, _productsService.GetProducts());
       }
 
       [HttpGet("search")]
@@ -66,11 +64,7 @@ namespace dvcsharp_core_api
             return Ok("Cannot search without a keyword");
          }
 
-         var query = $"SELECT * From Products WHERE name LIKE '%{keyword}%' OR description LIKE '%{keyword}%'";
-         var products = _context.Products
-            .FromSqlRaw(query)
-            .ToList();
-
+         var products = _productsService.GetProducts(keyword);
          return Ok(products);
       }
       
@@ -81,9 +75,7 @@ namespace dvcsharp_core_api
             return Ok("Cannot search without a keyword");
          }
 
-         var products = _context.Products
-            .FromSql($"SELECT * From Products WHERE name LIKE '%{keyword}%' OR description LIKE '%{keyword}%'")
-            .ToList();
+         var products = _productsService.GetProducts2(keyword);
 
          return Ok(products);
       }

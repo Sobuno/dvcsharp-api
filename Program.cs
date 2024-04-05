@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using dvcsharp_core_api.Data;
+using dvcsharp_core_api.Services;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -42,6 +43,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddMvc();
+
+builder.Services.AddScoped<ProductsService>();
 
 builder.Services.Configure<KestrelServerOptions>(options =>
 {
